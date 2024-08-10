@@ -1,21 +1,21 @@
-
-// components/Main.vue
 <template>
   <div class="main">
     <header>
       <button @click="toggleMenu" class="menu-button">☰</button>
       <h1>メイン画面</h1>
+      <p>ようこそ、{{ username }}さん</p>
     </header>
     <nav :class="{ 'open': isMenuOpen }">
       <ul>
         <li><a href="#" @click="closeMenu">ホーム</a></li>
         <li><a href="#" @click="closeMenu">プロフィール</a></li>
         <li><a href="#" @click="closeMenu">設定</a></li>
+        <li><a href="#" @click="navigateToAttendance">勤怠入力</a></li>
         <li><a href="#" @click="logout">ログアウト</a></li>
       </ul>
     </nav>
     <main>
-      <p>ようこそ、メイン画面へ！</p>
+      <router-view :username="username"></router-view>
     </main>
   </div>
 </template>
@@ -23,6 +23,12 @@
 <script>
 export default {
   name: 'Main',
+  props: {
+    username: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       isMenuOpen: false
@@ -34,6 +40,10 @@ export default {
     },
     closeMenu() {
       this.isMenuOpen = false
+    },
+    navigateToAttendance() {
+      this.closeMenu()
+      this.$router.push({ name: 'attendance', params: { username: this.username } })
     },
     logout() {
       // ログアウト処理を実装
