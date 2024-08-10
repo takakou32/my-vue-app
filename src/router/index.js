@@ -5,9 +5,17 @@ import Login from '../components/Login.vue'
 
 const routes = [
     { path: '/', redirect: '/login' },
-    { path: '/login', component: Login },
-    { path: '/main', component: Main },
-    { path: '/attendance', component: MonthlyAttendance }
+    { path: '/login', name: 'login', component: Login },
+    { 
+      path: '/main/:username', 
+      name: 'main',
+      component: Main,
+      props: true,
+      children: [
+        { path: '', component: { template: '<p>ようこそ、メイン画面へ！</p>' } },
+        { path: 'attendance', name: 'attendance', component: MonthlyAttendance, props: true }
+      ]
+    }
 ]
 
 const router = createRouter({
