@@ -1,5 +1,9 @@
 <template>
     <div>
+      <header>
+        <button @click="toggleMenu" class="menu-button">☰</button>
+        <h1>メイン画面</h1>
+      </header>
       <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold">月次勤怠管理</h1>
         <p>ようこそ、{{ user }}さん</p>

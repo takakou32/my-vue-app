@@ -45,3 +45,48 @@
     }
   }
   </script>
+
+  
+<style scoped>
+.main {
+  position: relative;
+}
+header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+.menu-button {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+nav {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background-color: #333;
+  transition: 0.3s;
+}
+nav.open {
+  left: 0;
+}
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+nav ul li a {
+  display: block;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+main {
+  padding: 20px;
+}
+</style>
