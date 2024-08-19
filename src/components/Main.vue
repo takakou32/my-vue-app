@@ -1,19 +1,20 @@
 <template>
   <div class="main">
     <header>
-      <button @click="toggleMenu" class="menu-button">☰</button>
-      <h1>メイン画面</h1>
-      <p>ようこそ、{{ username }}さん</p>
+      <div class="header-content">
+        <h1>メイン画面</h1>
+        <p>ようこそ、{{ username }}さん</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#" @click="closeMenu">ホーム</a></li>
+          <li><a href="#" @click="closeMenu">プロフィール</a></li>
+          <li><a href="#" @click="closeMenu">設定</a></li>
+          <li><a href="#" @click="navigateToAttendance">勤怠入力</a></li>
+          <li><a href="#" @click="logout">ログアウト</a></li>
+        </ul>
+      </nav>
     </header>
-    <nav :class="{ 'open': isMenuOpen }">
-      <ul>
-        <li><a href="#" @click="closeMenu">ホーム</a></li>
-        <li><a href="#" @click="closeMenu">プロフィール</a></li>
-        <li><a href="#" @click="closeMenu">設定</a></li>
-        <li><a href="#" @click="navigateToAttendance">勤怠入力</a></li>
-        <li><a href="#" @click="logout">ログアウト</a></li>
-      </ul>
-    </nav>
     <main>
       <router-view :username="username"></router-view>
     </main>
@@ -21,6 +22,8 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router'
+
 export default {
   name: 'Main',
   props: {
@@ -29,25 +32,25 @@ export default {
       required: true
     }
   },
-  data() {
-    return {
-      isMenuOpen: false
+  setup(props) {
+    const router = useRouter()
+
+    const closeMenu = () => {
+      // この関数は不要になりましたが、元のコードとの整合性のために残しています
     }
-  },
-  methods: {
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen
-    },
-    closeMenu() {
-      this.isMenuOpen = false
-    },
-    navigateToAttendance() {
-      this.closeMenu()
-      this.$router.push({ name: 'attendance', params: { username: this.username } })
-    },
-    logout() {
-      // ログアウト処理を実装
-      this.$router.push('/login')
+
+    const navigateToAttendance = () => {
+      router.push({ name: 'attendance', params: { username: props.username } })
+    }
+
+    const logout = () => {
+      router.push({ name: 'login' })
+    }
+
+    return {
+      closeMenu,
+      navigateToAttendance,
+      logout
     }
   }
 }
@@ -57,41 +60,40 @@ export default {
 .main {
   position: relative;
 }
+
 header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 10px 20px;
   background-color: #f0f0f0;
 }
-.menu-button {
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-right: 10px;
+
+.header-content {
+  display: flex;
+  align-items: center;
 }
-nav {
-  position: fixed;
-  top: 0;
-  left: -250px;
-  width: 250px;
-  height: 100%;
-  background-color: #333;
-  transition: 0.3s;
+
+.header-content h1 {
+  margin-right: 20px;
 }
-nav.open {
-  left: 0;
-}
+
 nav ul {
+  display: flex;
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
+
+nav ul li {
+  margin-left: 20px;
+}
+
 nav ul li a {
-  display: block;
-  color: white;
-  padding: 10px 20px;
   text-decoration: none;
+  color: #333;
 }
+
 main {
   padding: 20px;
 }
