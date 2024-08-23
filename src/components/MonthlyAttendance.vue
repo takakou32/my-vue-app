@@ -19,44 +19,54 @@
         PDF出力
       </button>
     </div>
-    <table class="min-w-full bg-white">
-      <thead>
-        <tr>
-          <th class="py-2 px-2 border-b">日付</th>
-          <th class="py-2 px-2 border-b">勤務区分</th>
-          <th class="py-2 px-2 border-b">出勤時刻</th>
-          <th class="py-2 px-2 border-b">退勤時刻</th>
-          <th class="py-2 px-2 border-b">休憩時間</th>
-          <th class="py-2 px-2 border-b">申請承認</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="day in daysInMonth" :key="day" :class="getDayClass(day)">
-          <td class="py-1 px-2 border-b">{{ formatDate(day) }} ({{ getWeekday(day) }})</td>
-          <td class="py-1 px-2 border-b">
-            <select v-model="attendanceRecords[formatDate(day)].workType" class="border rounded py-1 px-2 w-full">
-              <option value="出勤">出勤</option>
-              <option value="休日">休日</option>
-              <option value="有給">有給</option>
-            </select>
-          </td>
-          <td class="py-1 px-2 border-b">
-            <input type="time" v-model="attendanceRecords[formatDate(day)].clockIn" class="border rounded py-1 px-2 w-full">
-          </td>
-          <td class="py-1 px-2 border-b">
-            <input type="time" v-model="attendanceRecords[formatDate(day)].clockOut" class="border rounded py-1 px-2 w-full">
-          </td>
-          <td class="py-1 px-2 border-b">
-            <input type="text" v-model="attendanceRecords[formatDate(day)].breakTime" class="border rounded py-1 px-2 w-full" placeholder="1:00">
-          </td>
-          <td class="py-1 px-2 border-b">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm">
-              申請
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table class="min-w-full bg-white">
+        <thead>
+          <tr>
+            <th class="py-2 px-2 border-b">日付</th>
+            <th class="py-2 px-2 border-b">勤務区分</th>
+            <th class="py-2 px-2 border-b">出勤時刻</th>
+            <th class="py-2 px-2 border-b">退勤時刻</th>
+            <th class="py-2 px-2 border-b">休憩時間</th>
+            <th class="py-2 px-2 border-b">深夜休憩時間</th>
+            <th class="py-2 px-2 border-b">時間外作業時間</th>
+            <th class="py-2 px-2 border-b">申請承認</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="day in daysInMonth" :key="day" :class="getDayClass(day)">
+            <td class="py-1 px-2 border-b">{{ formatDate(day) }} ({{ getWeekday(day) }})</td>
+            <td class="py-1 px-2 border-b">
+              <select v-model="attendanceRecords[formatDate(day)].workType" class="border rounded py-1 px-2 w-full">
+                <option value="出勤">出勤</option>
+                <option value="休日">休日</option>
+                <option value="有給">有給</option>
+              </select>
+            </td>
+            <td class="py-1 px-2 border-b">
+              <input type="time" :value="formatTime(attendanceRecords[formatDate(day)].clockIn)" @input="updateTime($event, day, 'clockIn')" class="border rounded py-1 px-2 w-full" step="900">
+            </td>
+            <td class="py-1 px-2 border-b">
+              <input type="time" :value="formatTime(attendanceRecords[formatDate(day)].clockOut)" @input="updateTime($event, day, 'clockOut')" class="border rounded py-1 px-2 w-full" step="900">
+            </td>
+            <td class="py-1 px-2 border-b">
+              <input type="text" v-model="attendanceRecords[formatDate(day)].breakTime" class="border rounded py-1 px-2 w-full" placeholder="1:00">
+            </td>
+            <td class="py-1 px-2 border-b">
+              <input type="text" v-model="attendanceRecords[formatDate(day)].nightBreakTime" class="border rounded py-1 px-2 w-full" placeholder="0:30">
+            </td>
+            <td class="py-1 px-2 border-b">
+              <input type="text" v-model="attendanceRecords[formatDate(day)].overtimeHours" class="border rounded py-1 px-2 w-full" placeholder="2:00">
+            </td>
+            <td class="py-1 px-2 border-b">
+              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm">
+                申請
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -122,12 +132,33 @@ export default {
       return ''
     }
 
+    const formatTime = (time) => {
+      if (!time) return ''
+      const [hours, minutes] = time.split(':')
+      const roundedMinutes = Math.round(parseInt(minutes) / 15) * 15
+      return `${hours}:${roundedMinutes.toString().padStart(2, '0')}`
+    }
+
+    const updateTime = (event, day, type) => {
+      const value = event.target.value
+      const [hours, minutes] = value.split(':')
+      const roundedMinutes = Math.round(parseInt(minutes) / 15) * 15
+      attendanceRecords[formatDate(day)][type] = `${hours}:${roundedMinutes.toString().padStart(2, '0')}`
+    }
+
     const fetchMonthlyAttendance = () => {
       // ここでAPIコールを行うことを想定
       const newRecords = {}
       for (let i = 1; i <= daysInMonth.value; i++) {
         const date = formatDate(i)
-        newRecords[date] = attendanceRecords[date] || { workType: '出勤', clockIn: '', clockOut: '', breakTime: '' }
+        newRecords[date] = attendanceRecords[date] || {
+          workType: '出勤',
+          clockIn: '',
+          clockOut: '',
+          breakTime: '',
+          nightBreakTime: '',
+          overtimeHours: ''
+        }
       }
       Object.assign(attendanceRecords, newRecords)
     }
@@ -152,7 +183,9 @@ export default {
       getDayClass,
       handleSave,
       years,
-      months
+      months,
+      formatTime,
+      updateTime
     }
   }
 }
@@ -178,9 +211,11 @@ export default {
   gap: 10px;
   margin-bottom: 20px;
 }
-table {
+.table-container {
+  overflow-x: auto;
+}
+.table-container table {
   width: 100%;
-  border-collapse: collapse;
 }
 th, td {
   border: 1px solid #ddd;
